@@ -140,13 +140,13 @@ void CameraTis::_initialize_camera()
 
   //初始化相机
         std::string v4l2_cmd = "media-ctl -d /dev/media0 --set-v4l2 '\"m00_b_mvcam 5-003b\":0[fmt:Y8_1X8/" +
-                            std::to_string(width) + "x" + std::to_string(height) +
-                            "@1/" + std::to_string(fps) + " field:none]'";
+                            std::to_string(2048) + "x" + std::to_string(1544) +
+                            "@1/" + std::to_string(45) + " field:none]'";
 
     system(v4l2_cmd.c_str());
 
     std::string v4l2src_pipeline = "v4l2src io-mode=dmabuf device=/dev/video0 ! video/x-raw, format=(string)GRAY8, width=(int)" +
-                                    std::to_string(width) + ", height=(int)" + std::to_string(height) +
+                                    std::to_string(2048) + ", height=(int)" + std::to_string(1544) +
                                     " ! appsink";
 
     cv::VideoCapture cap(v4l2src_pipeline, cv::CAP_GSTREAMER);
@@ -348,34 +348,36 @@ bool CameraTis::_power()
 
 int CameraTis::_power_on()
 {
-  if (_power() == false) {
-    if (gst_element_set_state(_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-      return 1;
-    }
-  }
+  // if (_power() == false) {
+  //   if (gst_element_set_state(_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
+  //     return 1;
+  //   }
+  // }
 
   return 0;
 }
 
 int CameraTis::_power_off()
 {
-  if (_power()) {
-    if (gst_element_set_state(_pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE) {
-      return 1;
-    }
-  }
+  // if (_power()) {
+  //   if (gst_element_set_state(_pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE) {
+  //     return 1;
+  //   }
+  // }
 
   return 0;
 }
 
 int CameraTis::_set_power(bool p)
 {
-  return p ? _power_on() : _power_off();
+  return 0;
+ // return p ? _power_on() : _power_off();
 }
 
 int CameraTis::_set_exposure(int e)
 {
-  return set_property(_pipeline, "Exposure Time (us)", e) ? 0 : 1;
+  return 0;
+  //return set_property(_pipeline, "Exposure Time (us)", e) ? 0 : 1;
 }
 
 int CameraTis::_set_width(int width)
