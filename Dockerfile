@@ -39,6 +39,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     gpiod \
     libmodbus5 \
     libv4l-dev \
+    libopencv-dev\
     /tiscamera.deb \
     && rm -rf /var/lib/apt/lists/* /tiscamera.deb
 
