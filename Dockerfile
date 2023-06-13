@@ -98,6 +98,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     python3-tk \
     python3-pil \
     python3-matplotlib \
+    libv4l-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./tools/seam_tracking_gui /workspace/sunny/tools/seam_tracking_gui
