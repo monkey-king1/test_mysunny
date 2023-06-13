@@ -38,6 +38,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     nano \
     gpiod \
     libmodbus5 \
+    libv4l-dev \
     /tiscamera.deb \
     && rm -rf /var/lib/apt/lists/* /tiscamera.deb
 
@@ -65,6 +66,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     libgstreamer-plugins-base1.0-dev \
     libglib2.0-dev \
     libgirepository1.0-dev \
+    libv4l-dev \
     && rm -rf /var/lib/apt/lists/*
 
 FROM dev AS build
@@ -89,6 +91,7 @@ RUN sed -i '/source/c source /workspace/sunny/install/setup.bash' /ros_entrypoin
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     vim \
+    libv4l-dev \
     && rm -rf /var/lib/apt/lists/*    
 
 FROM osrf/ros:galactic-desktop AS desktop
