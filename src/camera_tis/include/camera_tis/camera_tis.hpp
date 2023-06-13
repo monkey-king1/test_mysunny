@@ -46,7 +46,7 @@ public:
    * @param options Encapsulation of options for node initialization.
    */
   explicit CameraTis(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
-
+cv::VideoCapture cap;
   /**
    * @brief Destroy the Camera Tis object.
    *

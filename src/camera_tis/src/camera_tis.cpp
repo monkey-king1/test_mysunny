@@ -39,69 +39,7 @@ using rcl_interfaces::msg::SetParametersResult;
  * Then with videoscale plugin, it is scaled down to a lower resolution to reduce overall CPU usage.
  * The pipeline use appsink plugin to pass image date asynchronously.
  */
-constexpr char PIPELINE_STR[] =
-  "tcambin name=source"
-  " ! video/x-raw,format=GRAY8,width=2064,height=1544,framerate=30/1"
-  " ! videoscale"
-  " ! video/x-raw,width=1536,height=1024"
-  " ! appsink name=sink emit-signals=true sync=false drop=true max-buffers=4";
 
-/**
- * @brief Set the property object for string.
- *
- * @param property The name of the property to set.
- * @param value The value of the property to set.
- * @return gboolean true if success.
- */
-gboolean set_property(_GstElement * pipeline, const char * property, const char * value)
-{
-  gboolean ret = FALSE;
-  GstElement * bin = gst_bin_get_by_name(GST_BIN(pipeline), "source");
-  GValue val = G_VALUE_INIT;
-  g_value_init(&val, G_TYPE_STRING);
-  g_value_set_string(&val, value);
-  ret = tcam_prop_set_tcam_property(TCAM_PROP(bin), property, &val);
-  g_value_unset(&val);
-  gst_object_unref(bin);
-  return ret;
-}
-
-/**
- * @brief Set the property object for integer.
- *
- * @param property The name of the property to set.
- * @param value The value of the property to set.
- * @return gboolean true if success.
- */
-gboolean set_property(_GstElement * pipeline, const char * property, int value)
-{
-  gboolean ret = FALSE;
-  GstElement * bin = gst_bin_get_by_name(GST_BIN(pipeline), "source");
-  GValue type = {};
-  tcam_prop_get_tcam_property(
-    TCAM_PROP(bin),
-    property,
-    NULL,
-    NULL, NULL, NULL, NULL,
-    &type, NULL, NULL, NULL);
-  const char * t = g_value_get_string(&type);
-  if (strcmp(t, "boolean") == 0) {
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_BOOLEAN);
-    g_value_set_boolean(&val, value);
-    ret = tcam_prop_set_tcam_property(TCAM_PROP(bin), property, &val);
-    g_value_unset(&val);
-  } else {
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_INT);
-    g_value_set_int(&val, value);
-    ret = tcam_prop_set_tcam_property(TCAM_PROP(bin), property, &val);
-    g_value_unset(&val);
-  }
-  g_value_unset(&type);
-  gst_object_unref(bin);
-  return ret;
-}
 
 CameraTis::CameraTis(const rclcpp::NodeOptions & options)
 : Node("camera_tis_node", options)
@@ -131,9 +69,9 @@ CameraTis::~CameraTis()
     _threadmodbus.join();
   #endif
     _handle.reset();
-    gst_element_set_state(_pipeline, GST_STATE_NULL);
+    
     _thread.join();
-    gst_object_unref(_pipeline);
+   
     _pub.reset();
 
     RCLCPP_INFO(this->get_logger(), "Destroyed successfully");
