@@ -48,12 +48,12 @@ CameraTis::CameraTis(const rclcpp::NodeOptions & options)
    * @brief Const expression for image size infomation.
    *
    */
-  WIDTH = camdata.camer_size_width;
-  HEIGHT = camdata.camer_size_height;
+  WIDTH = 2048;
+  HEIGHT = 1544;
   SIZE = WIDTH * HEIGHT;
-  FPS = camdata.camer_fps;
-  VIEW_WIDTH = camdata.camer_size_view_width;
-  VIEW_HEIGHT = camdata.camer_size_view_height;
+  FPS = 30;
+  //VIEW_WIDTH = camdata.camer_size_view_width;
+  //VIEW_HEIGHT = camdata.camer_size_view_height;
 
 //_param_imagepos = std::make_shared<rclcpp::AsyncParametersClient>(this, "laser_imagepos_node");
   _pub = this->create_publisher<Image>(_pub_name, rclcpp::SensorDataQoS());
@@ -105,127 +105,17 @@ void CameraTis::_initialize_camera()
 
   _declare_parameters();
 
-//   gst_debug_set_default_threshold(GST_LEVEL_WARNING);
-//   gst_init(NULL, NULL);
 
-//   char newPIPELINE_STR[500];
-//   sprintf(newPIPELINE_STR,"tcambin name=source"
-//   " ! video/x-raw,format=GRAY8,width=%d,height=%d,framerate=%d/1"
-//   " ! videoscale"
-//   " ! video/x-raw,width=%d,height=%d"
-//   " ! appsink name=sink emit-signals=true sync=false drop=true max-buffers=4",VIEW_WIDTH,VIEW_HEIGHT,FPS,WIDTH,HEIGHT);
-
-//   _pipeline = gst_parse_launch(newPIPELINE_STR, NULL);
-//   if (_pipeline == NULL) {
-//     throw std::runtime_error("TIS parse launch fail");
-//   }
-
-//   // Disable auto exposure and auto gain, set brightness to 0
-  
-//   set_property(_pipeline, "Exposure Auto", false);
-//   set_property(_pipeline, "Gain Auto", false);
-//   set_property(_pipeline, "Brightness", 0);
-
-//   auto e = this->get_parameter("exposure_time").as_int();
-//   if (_set_exposure(e)) {
-//     throw std::runtime_error("TIS set exposure fail");
-//   }
-// //_param_imagepos->set_parameters({rclcpp::Parameter("rember_exposure_time", e)});
-
-//   // Set pipeline state to pause before spin.
-//   gst_element_set_state(_pipeline, GST_STATE_PAUSED);
-//   // Spin infinitely until rclcpp::ok() return false which means termination.
   
 
 
   //初始化相机
-        std::string v4l2_cmd = "media-ctl -d /dev/media0 --set-v4l2 '\"m00_b_mvcam 5-003b\":0[fmt:Y8_1X8/" +
-                            std::to_string(2048) + "x" + std::to_string(1544) +
-                            "@1/" + std::to_string(45) + " field:none]'";
-
-    system(v4l2_cmd.c_str());
-
-    std::string v4l2src_pipeline = "v4l2src io-mode=dmabuf device=/dev/video0 ! video/x-raw, format=(string)GRAY8, width=(int)" +
-                                    std::to_string(2048) + ", height=(int)" + std::to_string(1544) +
-                                    " ! appsink";
-
-    cv::VideoCapture cap(v4l2src_pipeline, cv::CAP_GSTREAMER);
-
-    if (!cap.isOpened()) 
-    {
-      std::cerr << "Failed to open camera" << std::endl;
-    }
 
 
   _thread = std::thread(&CameraTis::_spin, this);
 
   // ROS parameter callback handle.
  
-  _handle = this->add_on_set_parameters_callback(
-    [this](const std::vector<rclcpp::Parameter> & parameters) {
-      SetParametersResult result;
-      result.successful = true;
-      for (const auto & p : parameters) {
-        if (p.get_name() == "exposure_time") {
-          auto ret = this->_set_exposure(p.as_int());
-          if (ret) {
-            result.successful = false;
-            result.reason = "Failed to set exposure time";
-            return result;
-          }
-        } 
-        else if (p.get_name() == "power") {
-          auto ret = this->_set_power(p.as_bool());
-          if (ret) {
-            result.successful = false;
-            result.reason = "Failed to set power";
-            return result;
-          }
-        }    
-        else if (p.get_name() == "width") {
-          auto ret = this->_set_width(p.as_int());
-          if (ret) {
-            result.successful = false;
-            result.reason = "Failed to set width";
-            return result;
-          }
-        }
-        else if (p.get_name() == "height") {
-          auto ret = this->_set_height(p.as_int());
-          if (ret) {
-            result.successful = false;
-            result.reason = "Failed to set height";
-            return result;
-          }
-        }
-        else if (p.get_name() == "fps") {
-          auto ret = this->_set_fps(p.as_int());
-          if (ret) {
-            result.successful = false;
-            result.reason = "Failed to set fps";
-            return result;
-          }
-        }
-        else if (p.get_name() == "view_width") {
-          auto ret = this->_set_view_width(p.as_int());
-          if (ret) {
-            result.successful = false;
-            result.reason = "Failed to set view_width";
-            return result;
-          }
-        }
-        else if (p.get_name() == "view_height") {
-          auto ret = this->_set_view_height(p.as_int());
-          if (ret) {
-            result.successful = false;
-            result.reason = "Failed to set view_height";
-            return result;
-          }
-        }
-      }
-      return result;
-    }
-  );
 }
 
 #ifdef SHOW_OUTPUT_FPS
@@ -254,27 +144,33 @@ void CameraTis::_modbus(int port)
 
 void CameraTis::_spin()
 {
-  //GstElement * sink = gst_bin_get_by_name(GST_BIN(_pipeline), "sink");
-  int frame = 0;
-  while (rclcpp::ok()) {
-    //GstSample * sample = NULL;
-    //g_signal_emit_by_name(sink, "pull-sample", &sample, NULL);
-    // if (sample == NULL) {
-    //   continue;
-    // }
-    // GstBuffer * buffer = gst_sample_get_buffer(sample);
-    // if (buffer == NULL) {
-    //   gst_sample_unref(sample);
-    //   continue;
-    // }
 
-    // Construct a ROS image to publish.
-    //GstMapInfo info;
+  int frame = 0;
+  std::string v4l2_cmd = "media-ctl -d /dev/media0 --set-v4l2 '\"m00_b_mvcam 5-003b\":0[fmt:Y8_1X8/" +
+                            std::to_string(2048) + "x" + std::to_string(1544) +
+                            "@1/" + std::to_string(45) + " field:none]'";
+
+    system(v4l2_cmd.c_str());
+
+    std::string v4l2src_pipeline = "v4l2src io-mode=dmabuf device=/dev/video0 ! video/x-raw, format=(string)GRAY8, width=(int)" +
+                                    std::to_string(2048) + ", height=(int)" + std::to_string(1544) +
+                                    " ! appsink";
+
+    cv::VideoCapture cap(v4l2src_pipeline, cv::CAP_GSTREAMER);
+
+    if (!cap.isOpened()) 
+    {
+      std::cerr << "Failed to open camera" << std::endl;
+    }
+
+  while (rclcpp::ok()) {
 
     cv::Mat img;
-
-
-    if (cap.read(img)) {
+      cap.read(img);
+      if(img.empty())
+      continue;
+      //std::cout<<"aaa"<<std::endl;
+      std::cout<<img.size()<<std::endl;
       auto ptr = std::make_unique<Image>();
       ptr->header.stamp = this->now();
       ptr->header.frame_id = std::to_string(frame++);
@@ -285,7 +181,7 @@ void CameraTis::_spin()
       ptr->step = WIDTH;
       ptr->data.resize(SIZE);
       memcpy(ptr->data.data(), img.data, SIZE);
-
+     
     #ifdef SHOW_OUTPUT_FPS
       if(b_modbusconnect==true)
       {
@@ -315,140 +211,12 @@ void CameraTis::_spin()
           }
       }
     #endif
-    /*
-      if(b_modbusconnect==true)
-      {
-          auto stamp = ptr->header.stamp;
-          time_t t;
-          u_int16_t msec = ptr->header.stamp.nanosec/1000000;
-          struct tm *p;
-          t=stamp.sec;
-          p=gmtime(&t);  
-          u_int16_t tab_reg[4];
-          tab_reg[0]=(p->tm_hour+8)%24;
-          tab_reg[1]=p->tm_min;
-          tab_reg[2]=p->tm_sec;
-          tab_reg[3]=msec;
-          int rc=modbus_write_registers(ctx,0x0d,4,tab_reg);
-      }
-    */
       _pub->publish(std::move(ptr));
-      //gst_buffer_unmap(buffer, &info);
-
-    }
-   // gst_sample_unref(sample);
+    
   }
- // gst_object_unref(sink);
+
 }
 
-bool CameraTis::_power()
-{
-  return this->get_parameter("power").as_bool();
-}
-
-int CameraTis::_power_on()
-{
-  // if (_power() == false) {
-  //   if (gst_element_set_state(_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-  //     return 1;
-  //   }
-  // }
-
-  return 0;
-}
-
-int CameraTis::_power_off()
-{
-  // if (_power()) {
-  //   if (gst_element_set_state(_pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE) {
-  //     return 1;
-  //   }
-  // }
-
-  return 0;
-}
-
-int CameraTis::_set_power(bool p)
-{
-  return 0;
- // return p ? _power_on() : _power_off();
-}
-
-int CameraTis::_set_exposure(int e)
-{
-  return 0;
-  //return set_property(_pipeline, "Exposure Time (us)", e) ? 0 : 1;
-}
-
-int CameraTis::_set_width(int width)
-{
-  if(width<(int)camdata.camer_size_width_min||width>(int)camdata.camer_size_width_max)
-  { 
-    return 1;
-  }
-  else
-  {
-    camdata.camer_size_width=width;
-    camdata.write_camer_para();
-  }
-  return 0;
-}
-
-int CameraTis::_set_height(int height)
-{
-  if(height<(int)camdata.camer_size_height_min||height>(int)camdata.camer_size_height_max)
-  { 
-    return 1;
-  }
-  else
-  {
-    camdata.camer_size_height=height;
-    camdata.write_camer_para();
-  }
-  return 0;
-}
-
-int CameraTis::_set_view_width(int width)
-{
-  if(width<(int)camdata.camer_size_view_width_min||width>(int)camdata.camer_size_view_width_max)
-  { 
-    return 1;
-  }
-  else
-  {
-    camdata.camer_size_view_width=width;
-    camdata.write_camer_para();
-  }
-  return 0;
-}
-
-int CameraTis::_set_view_height(int height)
-{
-  if(height<(int)camdata.camer_size_view_height_min||height>(int)camdata.camer_size_view_height_max)
-  { 
-    return 1;
-  }
-  else
-  {
-    camdata.camer_size_view_height=height;
-    camdata.write_camer_para();
-  }
-  return 0;
-}
-
-int CameraTis::_set_fps(int fps)
-{
-  if(fps<(int)camdata.camer_fps_min||fps>(int)camdata.camer_fps_max)
-  { 
-    return 1;
-  }
-  else
-  {
-    camdata.camer_fps=fps;
-    camdata.write_camer_para();
-  }
-  return 0;
-}
 
 }  // namespace camera_tis
 
