@@ -23,9 +23,9 @@
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
 
 # Build enviroments
-FROM qubo188612/ros-opencv:latest AS opencv
+FROM yingjiea/ros-opencv:latest AS opencv
 
-FROM qubo188612/ros-tis:0.14.0 AS tiscamera
+FROM yingjiea/ros-tis:0.14.0 AS tiscamera
 
 FROM ros:galactic AS runtime
 
